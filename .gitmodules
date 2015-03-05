@@ -1,0 +1,3 @@
+[submodule "deps/http"]
+	path = deps/http
+	url = git@github.com:bidstack/bidstack-http
