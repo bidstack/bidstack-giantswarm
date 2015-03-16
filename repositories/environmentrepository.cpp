@@ -116,8 +116,8 @@ QVariantList EnvironmentRepository::all(QString companyName) {
 
 QVariantList EnvironmentRepository::all() {
     const QString sql =
-      "SELECT name FROM environments "
-        "ORDER BY name ASC";
+      "SELECT name, company_name FROM environments "
+        "ORDER BY company_name ASC, name ASC";
 
     QSqlQuery stmt(database());
     stmt.prepare(sql);
@@ -130,7 +130,10 @@ QVariantList EnvironmentRepository::all() {
 
     QVariantList environments;
     while (stmt.next()) {
-        environments.append(stmt.value(0).toString());
+        QVariantMap environment;
+        environment["name"] = stmt.value(0).toString();
+        environment["company_name"] = stmt.value(1).toString();
+        environments.append(environment);
     }
 
     return environments;
