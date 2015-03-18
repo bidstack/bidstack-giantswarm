@@ -348,18 +348,22 @@ QVariantMap GiantswarmClient::getApplicationStatus(QString companyName, QString 
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/status");
     HttpResponse* response;
 
-    QVariantList services;
+    QVariantMap application;
+    application["name"] = "";
+    application["status"] = "";
+    application["services"] = QVariantList();
 
     try {
         response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
-        return services;
+        return application;
     }
 
     QJsonObject data = extractDataAsObject(response);
 
+    QVariantList services;
     foreach (QJsonValue serviceElement, data["services"].toArray()) {
         QJsonObject serviceItem = serviceElement.toObject();
 
@@ -397,7 +401,6 @@ QVariantMap GiantswarmClient::getApplicationStatus(QString companyName, QString 
         services.append(service);
     }
 
-    QVariantMap application;
     application["name"] = data["name"].toString();
     application["status"] = data["status"].toString();
     application["services"] = services;
