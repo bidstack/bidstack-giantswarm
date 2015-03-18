@@ -238,6 +238,24 @@ bool GiantswarmClient::deleteEnvironment(QString companyName, QString environmen
  * Applications
  */
 
+QVariantList GiantswarmClient::getAllApplications() {
+    QVariantList applications;
+
+    foreach (QVariant company, getCompanies()) {
+        QString companyName = company.toString();
+
+        foreach (QVariant environment, getEnvironments()) {
+            QString environmentName = environment.toString();
+
+            foreach (QVariant application, getApplications(companyName, environmentName)) {
+                applications.append(application);
+            }
+        }
+    }
+
+    return applications;
+}
+
 QVariantList GiantswarmClient::getApplications(QString companyName, QString environmentName) {
     assertLoggedIn();
 
