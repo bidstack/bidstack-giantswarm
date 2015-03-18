@@ -49,8 +49,13 @@ bool GiantswarmClient::login(QString email, QString password) {
     request->setUrl(m_endpoint + "/user/" + email + "/login");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse *response = send(request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    try {
+        HttpResponse *response = send(request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     QJsonObject data = extractDataAsObject(response);
     m_token = data.take("Id").toString();
@@ -70,8 +75,13 @@ bool GiantswarmClient::logout() {
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/token/logout");
 
-    HttpResponse *response = send(request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    try {
+        HttpResponse *response = send(request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     m_token = "";
     return true;
@@ -96,10 +106,16 @@ QVariantList GiantswarmClient::getCompanies() {
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/user/me/memberships");
 
-    HttpResponse *response = send("companies", request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
-
     QVariantList companies;
+
+    try {
+        HttpResponse *response = send("companies", request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return companies;
+    }
+
     QJsonArray data = extractDataAsArray(response);
 
     for (int i = 0; i < data.size(); ++i) {
@@ -127,8 +143,13 @@ bool GiantswarmClient::createCompany(QString companyName) {
     request->setUrl(m_endpoint + "/company");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_CREATED);
+    try {
+        HttpResponse *response = send(request);
+        assertStatusCode(response, STATUS_CODE_CREATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -140,8 +161,13 @@ bool GiantswarmClient::deleteCompany(QString companyName) {
     request->setMethod("DELETE");
     request->setUrl(m_endpoint + "/company/" + companyName);
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_DELETED);
+    try {
+        HttpResponse *response = send(request);
+        assertStatusCode(response, STATUS_CODE_DELETED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -157,13 +183,19 @@ QVariantList GiantswarmClient::getCompanyUsers(QString companyName) {
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName);
 
-    HttpResponse* response = send("company_users", request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    QVariantList users;
+
+    try {
+        HttpResponse* response = send("company_users", request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return users;
+    }
 
     QJsonObject data = extractDataAsObject(response);
     QJsonArray members = data["members"].toArray();
 
-    QVariantList users;
     for (int i = 0; i < members.size(); ++i) {
         users.append(members.takeAt(i).toString());
     }
@@ -185,8 +217,13 @@ bool GiantswarmClient::addUserToCompany(QString companyName, QString username) {
     request->setUrl(m_endpoint + "/company/" + companyName + "/members/add");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_UPDATED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_UPDATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -205,8 +242,13 @@ bool GiantswarmClient::removeUserFromCompany(QString companyName, QString userna
     request->setUrl(m_endpoint + "/company/" + companyName + "/members/remove");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_UPDATED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_UPDATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -267,11 +309,17 @@ QVariantList GiantswarmClient::getApplications(QString companyName, QString envi
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/");
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    QVariantList applications;
+
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return applications;
+    }
 
     QJsonArray data = extractDataAsArray(response);
-    QVariantList applications;
 
     for (int i = 0; i < data.size(); ++i) {
         QJsonObject item = data.takeAt(i).toObject();
@@ -295,12 +343,18 @@ QVariantMap GiantswarmClient::getApplicationStatus(QString companyName, QString 
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/status");
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    QVariantList services;
+
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return services;
+    }
 
     QJsonObject data = extractDataAsObject(response);
 
-    QVariantList services;
     foreach (QJsonValue serviceElement, data["services"].toArray()) {
         QJsonObject serviceItem = serviceElement.toObject();
 
@@ -361,8 +415,13 @@ bool GiantswarmClient::startApplication(QString companyName, QString environment
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/start");
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_STARTED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_STARTED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -374,8 +433,13 @@ bool GiantswarmClient::stopApplication(QString companyName, QString environmentN
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/stop");
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_STOPPED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_STOPPED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -398,8 +462,13 @@ bool GiantswarmClient::scaleApplicationUp(QString companyName, QString environme
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/service/" + serviceName + "/component/" + componentName + "/scaleup/" + QString::number(count));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_UPDATED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_UPDATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -422,8 +491,13 @@ bool GiantswarmClient::scaleApplicationDown(QString companyName, QString environ
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/service/" + serviceName + "/component/" + componentName + "/scaleup/" + QString::number(count));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_DELETED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_DELETED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -439,12 +513,18 @@ QVariantMap GiantswarmClient::getInstanceStatistics(QString companyName, QString
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/instance/" + instanceId + "/stats");
 
-    HttpResponse* response = send("", request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    QVariantMap statistics;
+
+    try {
+        HttpResponse* response = send("", request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return statistics;
+    }
 
     QJsonObject data = extractDataAsObject(response);
 
-    QVariantMap statistics;
     statistics["component"] = data["ComponentName"].toString();
     statistics["memory_usage_mb"] = data["MemoryUsageMb"].toDouble();
     statistics["memory_capacity_mb"] = data["MemoryCapacityMb"].toDouble();
@@ -465,12 +545,20 @@ QVariantMap GiantswarmClient::getUser() {
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/user/me");
 
-    HttpResponse* response = send("user", request);
-    assertStatusCode(response, STATUS_CODE_SUCCESS);
+    QVariantMap user;
+    user["name"] = "";
+    user["email"] = "";
+
+    try {
+        HttpResponse* response = send("user", request);
+        assertStatusCode(response, STATUS_CODE_SUCCESS);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return user;
+    }
 
     QJsonObject data = extractDataAsObject(response);
 
-    QVariantMap user;
     user["name"] = data.take("username").toString();
     user["email"] = data.take("email").toString();
 
@@ -494,8 +582,13 @@ bool GiantswarmClient::updateEmail(QString email) {
     request->setUrl(m_endpoint + "/user/me/email/update");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_UPDATED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_UPDATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -517,8 +610,13 @@ bool GiantswarmClient::updatePassword(QString old_password, QString new_password
     request->setUrl(m_endpoint + "/user/me/password/update");
     request->setBody(new HttpBody(doc.toJson()));
 
-    HttpResponse* response = send(request);
-    assertStatusCode(response, STATUS_CODE_UPDATED);
+    try {
+        HttpResponse* response = send(request);
+        assertStatusCode(response, STATUS_CODE_UPDATED);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return true;
 }
@@ -532,7 +630,12 @@ bool GiantswarmClient::ping() {
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/ping");
 
-    HttpResponse* response = send(request);
+    try {
+        HttpResponse* response = send(request);
+    } catch (GiantswarmError& e) {
+        qWarning() << "Error:" << e.errorString();
+        return false;
+    }
 
     return response->body()->toString() == "\"OK\"\n";
 }
