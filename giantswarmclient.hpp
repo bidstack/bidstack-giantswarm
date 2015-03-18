@@ -45,6 +45,7 @@ namespace Bidstack {
             Q_INVOKABLE bool login(QString email, QString password);
             Q_INVOKABLE bool logout();
             Q_INVOKABLE bool isLoggedIn();
+            Q_INVOKABLE void setToken(QString token);
 
             Q_INVOKABLE QVariantList getCompanies();
             Q_INVOKABLE bool hasCompanies();

@@ -81,6 +81,10 @@ bool GiantswarmClient::isLoggedIn() {
     return !m_token.isEmpty();
 }
 
+void GiantswarmClient::setToken(QString token) {
+  m_token = token;
+}
+
 /**
  * Companies
  */
