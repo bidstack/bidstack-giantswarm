@@ -77,7 +77,7 @@ bool GiantswarmClient::logout() {
     request->setUrl(m_endpoint + "/token/logout");
 
     try {
-        Httpresponse* response = send(request);
+        HttpResponse* response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
