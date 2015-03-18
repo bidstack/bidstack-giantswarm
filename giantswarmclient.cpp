@@ -245,7 +245,7 @@ QVariantList GiantswarmClient::getAllApplications() {
         QString companyName = company.toString();
 
         foreach (QVariant environment, getEnvironments()) {
-            QString environmentName = environment.toString();
+            QString environmentName = environment.toMap()["name"].toString();
 
             foreach (QVariant application, getApplications(companyName, environmentName)) {
                 applications.append(application);
