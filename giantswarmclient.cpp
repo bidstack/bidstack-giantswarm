@@ -48,9 +48,10 @@ bool GiantswarmClient::login(QString email, QString password) {
     request->setMethod("POST");
     request->setUrl(m_endpoint + "/user/" + email + "/login");
     request->setBody(new HttpBody(doc.toJson()));
+    HttpResponse* response;
 
     try {
-        HttpResponse *response = send(request);
+        response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -76,7 +77,7 @@ bool GiantswarmClient::logout() {
     request->setUrl(m_endpoint + "/token/logout");
 
     try {
-        HttpResponse *response = send(request);
+        Httpresponse* response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -105,11 +106,12 @@ QVariantList GiantswarmClient::getCompanies() {
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/user/me/memberships");
+    HttpResponse* response;
 
     QVariantList companies;
 
     try {
-        HttpResponse *response = send("companies", request);
+        response = send("companies", request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -144,7 +146,7 @@ bool GiantswarmClient::createCompany(QString companyName) {
     request->setBody(new HttpBody(doc.toJson()));
 
     try {
-        HttpResponse *response = send(request);
+        HttpResponse* response = send(request);
         assertStatusCode(response, STATUS_CODE_CREATED);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -162,7 +164,7 @@ bool GiantswarmClient::deleteCompany(QString companyName) {
     request->setUrl(m_endpoint + "/company/" + companyName);
 
     try {
-        HttpResponse *response = send(request);
+        HttpResponse* response = send(request);
         assertStatusCode(response, STATUS_CODE_DELETED);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -182,11 +184,12 @@ QVariantList GiantswarmClient::getCompanyUsers(QString companyName) {
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName);
+    HttpResponse* response;
 
     QVariantList users;
 
     try {
-        HttpResponse* response = send("company_users", request);
+        response = send("company_users", request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -308,11 +311,12 @@ QVariantList GiantswarmClient::getApplications(QString companyName, QString envi
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/");
+    HttpResponse* response;
 
     QVariantList applications;
 
     try {
-        HttpResponse* response = send(request);
+        response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -342,11 +346,12 @@ QVariantMap GiantswarmClient::getApplicationStatus(QString companyName, QString 
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/" + applicationName + "/status");
+    HttpResponse* response;
 
     QVariantList services;
 
     try {
-        HttpResponse* response = send(request);
+        response = send(request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -512,12 +517,13 @@ QVariantMap GiantswarmClient::getInstanceStatistics(QString companyName, QString
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/company/" + companyName + "/instance/" + instanceId + "/stats");
+    HttpResponse* response;
 
     QVariantMap statistics;
 
     try {
         QString cacheKey("instance_statistics_" + instanceId);
-        HttpResponse* response = send(cacheKey, request);
+        response = send(cacheKey, request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -545,13 +551,14 @@ QVariantMap GiantswarmClient::getUser() {
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/user/me");
+    HttpResponse* response;
 
     QVariantMap user;
     user["name"] = "";
     user["email"] = "";
 
     try {
-        HttpResponse* response = send("user", request);
+        response = send("user", request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
@@ -630,9 +637,10 @@ bool GiantswarmClient::ping() {
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
     request->setUrl(m_endpoint + "/ping");
+    HttpResponse* response;
 
     try {
-        HttpResponse* response = send(request);
+        response = send(request);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
         return false;
