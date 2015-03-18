@@ -82,7 +82,7 @@ bool GiantswarmClient::isLoggedIn() {
 }
 
 void GiantswarmClient::setToken(QString token) {
-  m_token = token;
+    m_token = token;
 }
 
 /**
