@@ -516,7 +516,8 @@ QVariantMap GiantswarmClient::getInstanceStatistics(QString companyName, QString
     QVariantMap statistics;
 
     try {
-        HttpResponse* response = send("", request);
+        QString cacheKey("instance_statistics_" + instanceId);
+        HttpResponse* response = send(cacheKey, request);
         assertStatusCode(response, STATUS_CODE_SUCCESS);
     } catch (GiantswarmError& e) {
         qWarning() << "Error:" << e.errorString();
