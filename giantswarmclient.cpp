@@ -261,7 +261,7 @@ QVariantList GiantswarmClient::getApplications(QString companyName, QString envi
 
     HttpRequest* request = new HttpRequest();
     request->setMethod("GET");
-    request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app");
+    request->setUrl(m_endpoint + "/company/" + companyName + "/env/" + environmentName + "/app/");
 
     HttpResponse* response = send(request);
     assertStatusCode(response, STATUS_CODE_SUCCESS);
